@@ -420,24 +420,20 @@ public class ArticleTextExtractor {
 
             int weight = 0;
             int height = 0;
-            try {
-                height = Integer.parseInt(e.attr("height"));
-                if (height >= 50)
-                    weight += 20;
-                else
-                    weight -= 20;
-            } catch (Exception ex) {
-            }
-
             int width = 0;
-            try {
-                width = Integer.parseInt(e.attr("width"));
-                if (width >= 50)
-                    weight += 20;
-                else
-                    weight -= 20;
-            } catch (Exception ex) {
-            }
+
+            try { height = Integer.parseInt(e.attr("height")); } catch (Exception ex) {}
+            try { height = Integer.parseInt(e.attr("naturalHeight")); } catch (Exception ex) {}
+
+            try { width = Integer.parseInt(e.attr("width")); } catch (Exception ex) {}
+            try { width = Integer.parseInt(e.attr("naturalWidth")); } catch (Exception ex) {}
+
+            weight += (height >= 50) ? 20 : -20;
+            weight += (width >= 50) ? 20 : -20;
+
+            if (height > 150 && width > 300)
+                weight += 60;
+
             String alt = e.attr("alt");
             if (alt.length() > 35)
                 weight += 20;
@@ -472,7 +468,7 @@ public class ArticleTextExtractor {
     }
 
     /**
-     * Prepares document. Currently only stipping unlikely candidates, since
+     * Prepares document. Currently only stripping unlikely candidates, since
      * from time to time they're getting more score than good ones especially in
      * cases when major text is short.
      *

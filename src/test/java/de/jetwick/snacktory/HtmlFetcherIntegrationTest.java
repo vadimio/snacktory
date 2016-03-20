@@ -32,7 +32,7 @@ public class HtmlFetcherIntegrationTest {
         JResult res = new HtmlFetcher().fetchAndExtract("http://www.tumblr.com/xeb22gs619", 10000, true);
 //        System.out.println("tumblr:" + res.getUrl());
 
-        res = new HtmlFetcher().fetchAndExtract("http://www.faz.net/-01s7fc", 10000, true);
+//        res = new HtmlFetcher().fetchAndExtract("http://www.faz.net/-01s7fc", 10000, true);
 //        System.out.println("faz:" + res.getUrl());
 
         res = new HtmlFetcher().fetchAndExtract("http://www.google.com/url?sa=x&q=http://www.taz.de/1/politik/asien/artikel/1/anti-atomkraft-nein-danke/&ct=ga&cad=caeqargbiaaoataaoabaltmh7qrialaawabibwrllurf&cd=d5glzns5m_4&usg=afqjcnetx___sph8sjwhjwi-_mmdnhilra&utm_source=twitterfeed&utm_medium=twitter", 10000, true);
@@ -63,11 +63,12 @@ public class HtmlFetcherIntegrationTest {
 //        JResult res = new HtmlFetcher().fetchAndExtract("http://twitpic.com/4kuem8", 12000, true);
 //        assertTrue(res.getText(), res.getText().contains("*Not* what you want to see"));
 //    }
-    @Test
-    public void testEncoding() throws Exception {
-        JResult res = new HtmlFetcher().fetchAndExtract("http://www.yomiuri.co.jp/science/20140401-OYT1T50144.html", 10000, true);
-        assertEquals("承服できない・悪意ない…小保方晴子氏コメント：科学：読売新聞（YOMIURI ONLINE）", res.getTitle());
-    }
+    // not available anymore
+//    @Test
+//    public void testEncoding() throws Exception {
+//        JResult res = new HtmlFetcher().fetchAndExtract("http://www.yomiuri.co.jp/science/20140401-OYT1T50144.html", 10000, true);
+//        assertEquals("承服できない・悪意ない…小保方晴子氏コメント：科学：読売新聞（YOMIURI ONLINE）", res.getTitle());
+//    }
 
     @Test
     public void testHashbang() throws Exception {
