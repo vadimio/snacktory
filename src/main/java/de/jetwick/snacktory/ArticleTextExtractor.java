@@ -428,11 +428,14 @@ public class ArticleTextExtractor {
             try { width = Integer.parseInt(e.attr("width")); } catch (Exception ex) {}
             try { width = Integer.parseInt(e.attr("naturalWidth")); } catch (Exception ex) {}
 
-            weight += (height >= 50) ? 20 : -20;
-            weight += (width >= 50) ? 20 : -20;
-
+            // Real main pictures are bigger to provide decent quality
+            // We expect them to be 150x300 or bigger, anything less and this would be an advertisement
             if (height > 150 && width > 300)
                 weight += 60;
+            else { //Will give the some points, this is the original code
+                weight += (height >= 100) ? 20 : -20;
+                weight += (width >= 150) ? 20 : -20;
+            }
 
             String alt = e.attr("alt");
             if (alt.length() > 35)
@@ -456,7 +459,11 @@ public class ArticleTextExtractor {
             if (weight > maxWeight) {
                 maxWeight = weight;
                 maxNode = e;
-                score = score / 2;
+
+                //Not sure why we treat first found to so much of an advantage, but
+                //I at least discount anything less than 40points as not really found and keep looking
+                if (weight > 40)
+                    score = score / 2;
             }
 
             ImageResult image = new ImageResult(sourceUrl, weight, title, height, width, alt, noFollow);
