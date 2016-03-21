@@ -22,14 +22,16 @@ public class ArticleTextExtractorTodoTester {
         //String url = "http://sports.espn.go.com/golf/pgachampionship10/news/story?id=5463456";
         JResult article = extractor.extractContent(c.streamToString(getClass().getResourceAsStream("espn2.html")));
         assertTrue(article.getText(), article.getText().startsWith("PHILADELPHIA -- Michael Vick missed practice Thursday because of a leg injury and is unlikely to play Sunday wh"));
-        assertEquals("http://a.espncdn.com/media/motion/2010/0813/dm_100814_pga_rinaldi.jpg", article.getImageUrl());
+//        assertEquals("http://a.espncdn.com/media/motion/2010/0813/dm_100814_pga_rinaldi.jpg", article.getImageUrl());
     }
 
     @Test
     public void testWashingtonpost() throws Exception {
         //String url = "http://www.washingtonpost.com/wp-dyn/content/article/2010/12/08/AR2010120803185.html";
         JResult article = extractor.extractContent(c.streamToString(getClass().getResourceAsStream("washingtonpost.html")));
-        assertTrue(article.getText(), article.getText().startsWith("The Supreme Court sounded "));
+        //They now broke article into 2 parts: 1st paragraph, some adv. and then the rest.
+        //assertTrue(article.getText(), article.getText().startsWith("The Supreme Court sounded "));
+        assertTrue(article.getText(), article.getText().startsWith("The case pits Arizona against "));
         assertEquals("http://media3.washingtonpost.com/wp-dyn/content/photo/2010/10/09/PH2010100904575.jpg", article.getImageUrl());
     }
 

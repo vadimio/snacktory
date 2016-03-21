@@ -49,6 +49,8 @@ public class ArticleTextExtractor {
     private static final OutputFormatter DEFAULT_FORMATTER = new OutputFormatter();
     private OutputFormatter formatter = DEFAULT_FORMATTER;
 
+
+
     public ArticleTextExtractor() {
         setUnlikely("com(bx|ment|munity)|dis(qus|cuss)|e(xtra|[-]?mail)|foot|"
                 + "header|menu|re(mark|ply)|rss|sh(are|outbox)|sponsor"
@@ -101,16 +103,16 @@ public class ArticleTextExtractor {
      * with improper HTML, although jSoup should be able to handle minor stuff.
      * @returns extracted article, all HTML tags stripped
      */
+    public JResult extractContent(String html) throws Exception {
+        return extractContent(new JResult(), html);
+    }
+
     public JResult extractContent(Document doc) throws Exception {
         return extractContent(new JResult(), doc, formatter);
     }
 
     public JResult extractContent(Document doc, OutputFormatter formatter) throws Exception {
         return extractContent(new JResult(), doc, formatter);
-    }
-
-    public JResult extractContent(String html) throws Exception {
-        return extractContent(new JResult(), html);
     }
 
     public JResult extractContent(JResult res, String html) throws Exception {
@@ -152,6 +154,10 @@ public class ArticleTextExtractor {
 
         if (bestMatchElement != null) {
             List<ImageResult> images = new ArrayList<ImageResult>();
+            //Not sure why there is an attempt to limit picture finding to only bestMatch text document
+            //Lots of sites use altogether different div for the picture. May be something like below with
+            //additional biggest picture wins or some more complicated logic...
+            //Element imgEl = determineImageSource(doc, images);
             Element imgEl = determineImageSource(bestMatchElement, images);
             if (imgEl != null) {
                 res.setImageUrl(SHelper.replaceSpaces(imgEl.attr("src")));
@@ -423,50 +429,48 @@ public class ArticleTextExtractor {
             int width = 0;
 
             try { height = Integer.parseInt(e.attr("height")); } catch (Exception ex) {}
-            try { height = Integer.parseInt(e.attr("naturalHeight")); } catch (Exception ex) {}
-
             try { width = Integer.parseInt(e.attr("width")); } catch (Exception ex) {}
-            try { width = Integer.parseInt(e.attr("naturalWidth")); } catch (Exception ex) {}
+
+            String alt = e.attr("alt");
+            String title = e.attr("title");
+
+            boolean noFollow = false;
+            if (e.parent() != null && e.parent().attr("rel") != null && e.parent().attr("rel").contains("nofollow")) {
+                    noFollow = true;
+                    weight -= 40;
+            }
+
+            ImageResult image = new ImageResult(sourceUrl, 0, title, height, width, alt, noFollow);
 
             // Real main pictures are bigger to provide decent quality
             // We expect them to be 150x300 or bigger, anything less and this would be an advertisement
-            if (height > 150 && width > 300)
-                weight += 60;
-            else { //Will give the some points, this is the original code
+            // We also check that their aspect ration is within some sort of limits 0.75 < ratio < 2.4 (cinema is 2.33)
+            if (image.naturalHeight > 150 && image.naturalWidth > 200 &&
+                    (image.aspectRatio > 0.75 && image.aspectRatio < 2.4))
+                weight += 60; //biggest wins: + image.naturalHeight*image.naturalWidth / 1000;
+
+            else { //VZ: Will give  some points, this is the original code, but with bigger size requirements instead of 50
                 weight += (height >= 100) ? 20 : -20;
                 weight += (width >= 150) ? 20 : -20;
             }
 
-            String alt = e.attr("alt");
             if (alt.length() > 35)
                 weight += 20;
 
-            String title = e.attr("title");
             if (title.length() > 35)
                 weight += 20;
-
-            String rel = null;
-            boolean noFollow = false;
-            if (e.parent() != null) {
-                rel = e.parent().attr("rel");
-                if (rel != null && rel.contains("nofollow")) {
-                    noFollow = rel.contains("nofollow");
-                    weight -= 40;
-                }
-            }
 
             weight = (int) (weight * score);
             if (weight > maxWeight) {
                 maxWeight = weight;
                 maxNode = e;
 
-                //Not sure why we treat first found to so much of an advantage, but
-                //I at least discount anything less than 40points as not really found and keep looking
-                if (weight > 40)
+                //VZ: Not sure why original authors treat first found image to so much of an advantage.
+                //I have limited this rule only if we get first image strongly matching on all points
+                if (weight > 60)
                     score = score / 2;
             }
-
-            ImageResult image = new ImageResult(sourceUrl, weight, title, height, width, alt, noFollow);
+            image.weight =  weight;
             images.add(image);
         }
 
