@@ -53,7 +53,7 @@ public class ArticleTextExtractor {
 
     public ArticleTextExtractor() {
         setUnlikely("com(bx|ment|munity)|dis(qus|cuss)|e(xtra|[-]?mail)|foot|"
-                + "header|menu|re(mark|ply)|rss|sh(are|outbox)|sponsor"
+                + "header|headline|menu|re(mark|ply)|rss|sh(are|outbox)|sponsor"
                 + "a(d|ll|gegate|rchive|ttachment)|(pag(er|ination))|popup|print|"
                 + "login|si(debar|gn|ngle)");
         setPositive("(^(body|content|h?entry|main|page|post|text|blog|story|haupt))"
@@ -218,11 +218,12 @@ public class ArticleTextExtractor {
     }
 
     protected String extractDescription(Document doc) {
-        String description = SHelper.innerTrim(doc.select("head meta[name=description]").attr("content"));
+        String description = SHelper.innerTrim(doc.select("head meta[property=og:description]").attr("content"));
+
         if (description.isEmpty()) {
-            description = SHelper.innerTrim(doc.select("head meta[property=og:description]").attr("content"));
+            description = SHelper.innerTrim(doc.select("head meta[name=twitter:description]").attr("content"));
             if (description.isEmpty()) {
-                description = SHelper.innerTrim(doc.select("head meta[name=twitter:description]").attr("content"));
+                description = SHelper.innerTrim(doc.select("head meta[name=description]").attr("content"));
             }
         }
         return description;

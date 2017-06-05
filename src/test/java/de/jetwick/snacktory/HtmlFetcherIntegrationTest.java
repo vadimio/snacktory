@@ -71,6 +71,23 @@ public class HtmlFetcherIntegrationTest {
 //    }
 
     @Test
+    public void testRussiaTv() throws Exception {
+        JResult res = new HtmlFetcher().fetchAndExtract("https://en.crimerussia.com/gromkie-dela/no-military-service-makes-you-less-of-a-man-number-of-tver-massacre-victims-increased-to-9-/", 10000, true);
+        assertTrue(res.getTitle(), res.getTitle().startsWith("Russian Tver massacre death toll rises to 9"));
+
+        // not available anymore
+        //       res = new HtmlFetcher().fetchAndExtract("http://twitter.com/#!/th61/status/57141697720745984", 10000, true);
+        //       assertTrue(res.getTitle(), res.getTitle().startsWith("Twitter / TH61: “@AntiAtomPiraten:"));
+    }
+
+    @Test
+    public void testStandardCoUk() throws Exception {
+        JResult res = new HtmlFetcher().fetchAndExtract("http://www.standard.co.uk/news/crime/london-attack-donald-trump-sparks-fury-by-slamming-sadiq-khan-over-terror-response-a3556491.html", 10000, true);
+        assertTrue(res.getTitle(), res.getTitle().startsWith("After being offended by his interlocutors"));
+
+    }
+
+    @Test
     public void testHashbang() throws Exception {
         JResult res = new HtmlFetcher().fetchAndExtract("http://www.facebook.com/democracynow", 10000, true);
         assertTrue(res.getTitle(), res.getTitle().startsWith("Democracy Now! "));
