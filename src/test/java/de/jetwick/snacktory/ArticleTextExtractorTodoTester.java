@@ -18,6 +18,15 @@ public class ArticleTextExtractorTodoTester {
     }
 
     @Test
+    public void testReuters2full() throws Exception {
+        JResult article = new HtmlFetcher().fetchAndExtract(
+                //"http://www.reuters.com/article/us-fiatchrysler-recall-idUSKBN19612D?feedType=RSS&feedName=businessNews&utm_source=feedburner&utm_medium=feed&utm_campaign=Feed%3A+reuters%2FbusinessNews+%28Business+News%29",
+                "http://www.reuters.com/article/us-bp-ceo-idUSKBN19614U?feedType=RSS&feedName=businessNews&utm_source=feedburner&utm_medium=feed&utm_campaign=Feed%3A+reuters%2FbusinessNews+%28Business+News%29",
+                10000, true);
+        assertTrue(article.getText(), article.getText().startsWith("LONDON When BP boss Bob Dudley clinched a final deal to settle litigation over the deadly Deepwater Horizon disaster, many oil industry executives and "));
+    }
+
+    @Test
     public void testEspn2() throws Exception {
         //String url = "http://sports.espn.go.com/golf/pgachampionship10/news/story?id=5463456";
         JResult article = extractor.extractContent(c.streamToString(getClass().getResourceAsStream("espn2.html")));
