@@ -131,6 +131,9 @@ public class ArticleTextExtractor {
         if (doc == null)
             throw new NullPointerException("missing document");
 
+        doc.select("script, .hidden").remove();
+
+        res.setBody(extractBody(doc));
         res.setTitle(extractTitle(doc));
         res.setDescription(extractDescription(doc));
         res.setCanonicalUrl(extractCanonicalUrl(doc));
@@ -187,6 +190,10 @@ public class ArticleTextExtractor {
         res.setFaviconUrl(extractFaviconUrl(doc));
         res.setKeywords(extractKeywords(doc));
         return res;
+    }
+
+    protected String extractBody(Document doc) {
+        return doc.select("body").toString();
     }
 
     protected String extractTitle(Document doc) {

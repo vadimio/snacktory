@@ -28,6 +28,7 @@ import java.util.List;
  */
 public class JResult implements Serializable {
 
+    private String body;
     private String title;
     private String url;
     private String originalUrl;
@@ -54,6 +55,17 @@ public class JResult implements Serializable {
 
     public JResult setUrl(String url) {
         this.url = url;
+        return this;
+    }
+
+    public String getBody() {
+        if (body == null)
+            return "";
+        return body;
+    }
+
+    public JResult setBody(String body) {
+        this.body = body;
         return this;
     }
 
