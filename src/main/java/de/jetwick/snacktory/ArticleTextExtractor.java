@@ -55,7 +55,7 @@ public class ArticleTextExtractor {
         setUnlikely("com(bx|ment|munity)|dis(qus|cuss)|e(xtra|[-]?mail)|foot|"
                 + "header|headline|menu|re(mark|ply)|rss|sh(are|outbox)|sponsor"
                 + "a(d|ll|gegate|rchive|ttachment)|(pag(er|ination))|popup|print|"
-                + "login|si(debar|gn|ngle)");
+                + "login|si(debar|gn|ngle)|next-article(s|-container|-header)");
         setPositive("(^(body|content|h?entry|main|page|post|text|blog|story|haupt))"
                 + "|arti(cle|kel)|instapaper_body");
         setNegative("nav($|igation)|user|com(ment|bx)|(^com-)|contact|"
@@ -225,15 +225,20 @@ public class ArticleTextExtractor {
     }
 
     protected String extractDescription(Document doc) {
-        String description = SHelper.innerTrim(doc.select("head meta[property=og:description]").attr("content"));
+        String[] cssQuery = { // The order is important
+                "meta[property=og:description]",
+                "meta[name=twitter:description]",
+                "meta[name=description]" };
 
-        if (description.isEmpty()) {
-            description = SHelper.innerTrim(doc.select("head meta[name=twitter:description]").attr("content"));
-            if (description.isEmpty()) {
-                description = SHelper.innerTrim(doc.select("head meta[name=description]").attr("content"));
-            }
+        for (int i=0; i < cssQuery.length; i++) {
+            String res = SHelper.innerTrim(doc.select("head " + cssQuery[i]).attr("content"));
+            if (res != null && !res.isEmpty()) return res;
+
+            res = SHelper.innerTrim(doc.select("body " + cssQuery[i]).attr("content"));
+            if (res != null && !res.isEmpty()) return res;
         }
-        return description;
+
+        return "";
     }
 
     protected Collection<String> extractKeywords(Document doc) {
@@ -495,7 +500,7 @@ public class ArticleTextExtractor {
      * of function
      */
     protected void prepareDocument(Document doc) {
-//        stripUnlikelyCandidates(doc);
+        stripUnlikelyCandidates(doc);
         removeScriptsAndStyles(doc);
     }
 
@@ -510,8 +515,8 @@ public class ArticleTextExtractor {
             String className = child.className().toLowerCase();
             String id = child.id().toLowerCase();
 
-            if (NEGATIVE.matcher(className).find()
-                    || NEGATIVE.matcher(id).find()) {
+            if (UNLIKELY.matcher(className).find()
+                    || UNLIKELY.matcher(id).find()) {
 //                print("REMOVE:", child);
                 child.remove();
             }
